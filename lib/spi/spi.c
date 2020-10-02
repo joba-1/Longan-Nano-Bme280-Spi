@@ -3,17 +3,25 @@
 #include "gd32vf103_rcu.h"
 #include "gd32vf103_gpio.h"
 
-void spi_Init( uint32_t port, spi_parameter_struct *parameters ) {
-    // Example parameter config
-    // spi_init_struct->trans_mode           = SPI_TRANSMODE_FULLDUPLEX;
-    // spi_init_struct->device_mode          = SPI_MASTER;
-    // spi_init_struct->frame_size           = SPI_FRAMESIZE_8BIT;
-    // spi_init_struct->clock_polarity_phase = SPI_CK_PL_HIGH_PH_2EDGE;
-    // spi_init_struct->nss                  = SPI_NSS_SOFT;
-    // spi_init_struct->prescale             = SPI_PSC_32;
-    // spi_init_struct->endian               = SPI_ENDIAN_MSB;
+/*
+    // Example parameters as used for communication with a BME280 sensor
+    spi_parameter_struct p = {
+        .trans_mode           = SPI_TRANSMODE_FULLDUPLEX,
+        .device_mode          = SPI_MASTER,
+        .frame_size           = SPI_FRAMESIZE_8BIT,
+        .clock_polarity_phase = SPI_CK_PL_HIGH_PH_2EDGE, // MODE3
+        .nss                  = SPI_NSS_SOFT,            // Program controls CS
+        .prescale             = SPI_PSC_128,             // ABP2=108MHz -> SPI0=0.85MHz
+        .endian               = SPI_ENDIAN_MSB
+    };
 
-	rcu_periph_clock_enable(RCU_AF); // needed?
+    // Example CS pin configuration for PB12. Deselect with gpio_bit_set(), select with gpio_bit_reset().
+    rcu_periph_clock_enable(RCU_GPIOB);
+    gpio_init(GPIOB, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_12);
+    gpio_bit_set(GPIOB, GPIO_PIN_12);
+ */
+
+void spi_Init( uint32_t port, spi_parameter_struct *parameters ) {
 
     switch( port ) {
         case SPI0:
@@ -38,12 +46,7 @@ void spi_Init( uint32_t port, spi_parameter_struct *parameters ) {
             return;
     }
 
-    // Example CS pin configuration. Reset during transfer.
-    // gpio_init(GPIOB, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_12);
-    // gpio_bit_set(GPIOB, GPIO_PIN_12);
-
     spi_init(port, parameters);
-    // spi_crc_polynomial_set(port,7); // check this...
     spi_enable(port);
 }
 
