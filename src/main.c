@@ -3,6 +3,7 @@
 #include <bme280.h>
 #include <adc.h>
 #include <systick.h>
+#include <lcd.h>
 #include <stdio.h>
 
 // for LED and CS pins
@@ -23,7 +24,7 @@ struct leds {
     { GPIOA, GPIO_PIN_2, RCU_GPIOA }
 };
 
-enum colors { RED, GREEN, BLUE }; // match index of leds[]
+enum colors { Red, Green, Blue }; // match index of leds[]
 
 
 struct spi_io { 
@@ -41,7 +42,7 @@ void init_adc() {
 
 void init_usart0() {
     usart_init(USART0, 115200);
-    printf("BME V3 10/2020\n\rConnect BME280 to SPI0, CS to PA4\n\r");
+    printf("BME V4 10/2020\n\rConnect BME280 to SPI0, CS to PA4\n\r");
 }
 
 
@@ -56,7 +57,7 @@ void led_on( enum colors color ) {
 
 
 void init_leds() {
-    for( enum colors color = RED; color <= BLUE; color++ ) {
+    for( enum colors color = Red; color <= Blue; color++ ) {
         rcu_periph_clock_enable(leds[color].rcu);
         gpio_init(leds[color].port, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, leds[color].pin);
         led_on(color);
@@ -143,30 +144,52 @@ int8_t init_bme( struct bme280_dev *dev, struct spi_io *bme_io ) {
 }
 
 
+void display_line( uint8_t line, const char *label, double num, const char *unit, uint8_t ser_line, bool ok ) {
+    char msg[21];
+    snprintf(msg, sizeof(msg), " %-4s%6d.%02d %-2s ", label, (int)num, (int)(num * 100) % 100, unit);
+    if( ser_line == 1 ) printf("%s", msg);
+    LCD_ShowString(8, line * 16, (uint8_t *)msg, ok ? BLACK : RED);
+}
+
+
 void sensor_loop() {
-    while(1) {
+    static ser_line = 0;
+
+    while (1)
+    {
         // start a bme280 measurement
         bme280_set_sensor_mode(BME280_FORCED_MODE, &bme);
         // start an adc measurement
         adc_start_measurement();
 
         // ample time for measurements to complete, but we dont want to flood serial anyways...
-        delay_1ms(1000);
+        delay_1ms(100);
         
         struct bme280_data bme_data;
+        char deg[] = {127, 67, 0};
+        if( ++ser_line >= 100 ) {
+            ser_line = 0;
+        }
 
         bme280_get_sensor_data(BME280_ALL, &bme_data, &bme);
-        printf(" %s: %4d.%02d ", "P [Pa]", (int)bme_data.pressure, (int)(bme_data.pressure*100) %100);
-        printf(" %s: %3d.%02d ", "H [%]", (int)bme_data.humidity, (int)(bme_data.humidity*100) % 100);
-        printf(" %s: %3d.%02d ", "T [C]", (int)bme_data.temperature, (int)(bme_data.temperature*100) % 100);
+        display_line(0, "P", bme_data.pressure, "Pa", ser_line, (bme_data.pressure > 70000 && bme_data.pressure < 119000));
+        display_line(1, "H", bme_data.humidity, "%", ser_line, (bme_data.humidity > 20 && bme_data.humidity < 80));
+        display_line(2, "T", bme_data.temperature, deg, ser_line, (bme_data.temperature > 0 && bme_data.temperature < 70));
 
         double temperature, vref;
         adc_get_measurement(&temperature, &vref);
-        printf(" %s: %3d.%02d ", "Tint [C]", (int)temperature, (int)(temperature*100) % 100);
-        printf(" %s: %d.%2d ", "Vref [V]", (int)vref, (int)(vref*100) % 100);
+        display_line(3, "Tint", temperature, deg, ser_line, (temperature > 0 && temperature < 70));
+        display_line(4, "Vref", vref, "V", ser_line, (vref > 1.18 && vref < 1.22));
 
-        printf("\n\r");
+        if( ser_line == 1 ) printf("\n\r");
     }
+}
+
+
+void init_lcd() {
+    LCD_Init();
+    LCD_Clear(WHITE);
+    BACK_COLOR = WHITE;
 }
 
 
@@ -176,8 +199,9 @@ int main(void) {
     init_spi(SPI0);
     init_bme(&bme, &bme_io);
     init_adc();
+    init_lcd();
 
-    for( enum colors color = RED; color <= BLUE; color++ ) {
+    for( enum colors color = Red; color <= Blue; color++ ) {
         led_off(color);
     }
 
