@@ -14,3 +14,5 @@ It contains various examples that should be reusable in other code
 * License Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
 * Version 3
 * Updated 2020-10-02
+
+why do you [find valuable resources](https://github.com/MuellerA/LonganNanoTest/tree/master/SpiDma/src) only after it is too late. Ok I2C will be easier now :)
