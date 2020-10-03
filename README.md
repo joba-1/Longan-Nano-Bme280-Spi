@@ -10,7 +10,7 @@ It contains various examples that should be reusable in other code
 * Use BME280 sensor driver from Bosch with SPI
 * Use 160x80 OLED SPI LCD 
 
-![image of Longan Nano with LCD and BME280](https://user-images.githubusercontent.com/32450554/94978679-da074780-051e-11eb-9622-b903a371c695.png)
+![image](https://user-images.githubusercontent.com/32450554/94978935-3cad1300-0520-11eb-87f4-05830660fd91.png)
 
 * Author  Joachim Banzhaf
 * License Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
