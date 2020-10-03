@@ -8,6 +8,7 @@ It contains various examples that should be reusable in other code
 * Read onchip temperature and reference voltage
 * Init SPI
 * Use BME280 sensor driver from Bosch with SPI
+* Use 160x80 OLED SPI LCD 
 
 ![image of Longan Nano with LCD and BME280](https://user-images.githubusercontent.com/32450554/94978679-da074780-051e-11eb-9622-b903a371c695.png)
 
