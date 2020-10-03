@@ -9,6 +9,7 @@ It contains various examples that should be reusable in other code
 * Init SPI
 * Use BME280 sensor driver from Bosch with SPI
 
+![image of Longan Nano with LCD and BME280](https://user-images.githubusercontent.com/32450554/94978679-da074780-051e-11eb-9622-b903a371c695.png)
 
 * Author  Joachim Banzhaf
 * License Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
