@@ -153,7 +153,7 @@ void display_line( uint8_t line, const char *label, double num, const char *unit
 
 
 void sensor_loop() {
-    static ser_line = 0;
+    static int ser_line = 0;
 
     while (1)
     {
